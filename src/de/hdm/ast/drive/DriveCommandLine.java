@@ -48,7 +48,7 @@ public class DriveCommandLine {
 
     //Insert a file  
     File body = new File();
-    body.setTitle("My document");
+    body.setTitle("My document.txt");
     body.setDescription("A test document");
     body.setMimeType("text/plain");
     
