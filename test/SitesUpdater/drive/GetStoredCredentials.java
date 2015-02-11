@@ -9,8 +9,8 @@ public class GetStoredCredentials {
 	@Test
 	public void test() {
 		
-		System.out.println(MyClass.getStoredCredentials("web").getRefreshToken());
-		System.out.println(MyClass.getStoredCredentials("web").getAccessToken());
+		System.out.println(Authorization.getStoredCredentials("web").getRefreshToken());
+		System.out.println(Authorization.getStoredCredentials("web").getAccessToken());
 		
 	}
 

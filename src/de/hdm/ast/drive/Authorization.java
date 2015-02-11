@@ -8,6 +8,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfoplus;
@@ -15,8 +16,11 @@ import com.google.api.services.oauth2.model.Userinfoplus;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,7 +30,7 @@ import org.json.simple.parser.JSONParser;
 
 // ...
 
-public class MyClass {
+public class Authorization {
 
 	// Path to client_secrets.json which should contain a JSON document such as:
 	// {
@@ -44,9 +48,9 @@ public class MyClass {
 
 	private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 	private static final List<String> SCOPES = Arrays.asList(
-			"https://www.googleapis.com/auth/drive.file", "email", "profile");
+			"https://www.googleapis.com/auth/drive", "email", "profile");
 
-	private static JacksonFactory jsonFactory = new JacksonFactory();
+	
 
 	private static GoogleAuthorizationCodeFlow flow = null;
 
@@ -54,7 +58,7 @@ public class MyClass {
 	 * Exception thrown when an error occurred while retrieving credentials.
 	 */
 	public static class GetCredentialsException extends Exception {
-
+		private static final long serialVersionUID = -2759549467854873114L;
 		protected String authorizationUrl;
 
 		/**
@@ -86,6 +90,7 @@ public class MyClass {
 	 * Exception thrown when a code exchange has failed.
 	 */
 	public static class CodeExchangeException extends GetCredentialsException {
+		private static final long serialVersionUID = 2000878161378375281L;
 
 		/**
 		 * Construct a CodeExchangeException.
@@ -103,6 +108,7 @@ public class MyClass {
 	 * Exception thrown when no refresh token has been found.
 	 */
 	public static class NoRefreshTokenException extends GetCredentialsException {
+		private static final long serialVersionUID = -573734617291320828L;
 
 		/**
 		 * Construct a NoRefreshTokenException.
@@ -120,6 +126,7 @@ public class MyClass {
 	 * Exception thrown when no user ID could be retrieved.
 	 */
 	private static class NoUserIdException extends Exception {
+		private static final long serialVersionUID = -806754837878871672L;
 	}
 
 	/**
@@ -136,6 +143,7 @@ public class MyClass {
 
 		JSONParser parser = new JSONParser();
 		HttpTransport httpTransport = new NetHttpTransport();
+		JacksonFactory jsonFactory = new JacksonFactory();
 
 		try {
 
@@ -169,41 +177,41 @@ public class MyClass {
 	 *            User's ID.
 	 * @param credentials
 	 *            The OAuth 2.0 credentials to store.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings("unchecked")
-	public static void storeCredentials(String userId, Credential credentials) throws IOException {
+	public static void storeCredentials(String userId, Credential credentials)
+			throws IOException {
 		// TODO: Implement this method to work with your database.
 		// Store the credentials.getAccessToken() and
 		// credentials.getRefreshToken()
 		// string values in your database.
-		
-		
+
 		JSONObject obj = new JSONObject();
-        obj.put("accessToken", credentials.getAccessToken());
-        obj.put("refreshToken", credentials.getRefreshToken());
- 
-//        JSONArray company = new JSONArray();
-//        company.add("Compnay: eBay");
-//        company.add("Compnay: Paypal");
-//        company.add("Compnay: Google");
-//        obj.put("Company List", company);
- 
-        FileWriter file = new FileWriter("//C:/Users/Markus Schmieder/Documents/tokens.json");
-        try {
-            file.write(obj.toJSONString());
-            System.out.println("Successfully Copied JSON Object to File...");
-            System.out.println("\nJSON Object: " + obj);
- 
-        } catch (IOException e) {
-            e.printStackTrace();
- 
-        } finally {
-            file.flush();
-            file.close();
-        }
-    }
-	
+		obj.put("accessToken", credentials.getAccessToken());
+		obj.put("refreshToken", credentials.getRefreshToken());
+
+		// JSONArray company = new JSONArray();
+		// company.add("Compnay: eBay");
+		// company.add("Compnay: Paypal");
+		// company.add("Compnay: Google");
+		// obj.put("Company List", company);
+
+		FileWriter file = new FileWriter(
+				"//C:/Users/Markus Schmieder/Documents/tokens.json");
+		try {
+			file.write(obj.toJSONString());
+			System.out.println("Successfully Copied JSON Object to File...");
+			System.out.println("\nJSON Object: " + obj);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		} finally {
+			file.flush();
+			file.close();
+		}
+	}
 
 	/**
 	 * Build an authorization flow and store it as a static class attribute.
@@ -215,8 +223,10 @@ public class MyClass {
 	static GoogleAuthorizationCodeFlow getFlow() throws IOException {
 		if (flow == null) {
 			HttpTransport httpTransport = new NetHttpTransport();
+			JsonFactory jsonFactory = new JacksonFactory();
 			Reader reader = new InputStreamReader(
-					MyClass.class.getResourceAsStream(CLIENTSECRETS_LOCATION));
+					Authorization.class
+							.getResourceAsStream(CLIENTSECRETS_LOCATION));
 			GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
 					jsonFactory, reader);
 			flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
@@ -323,7 +333,7 @@ public class MyClass {
 	public static Credential getCredentials(String authorizationCode,
 			String state) throws CodeExchangeException,
 			NoRefreshTokenException, IOException {
-		String emailAddress = "";
+		String emailAddress = "markusschmieder1986@googlemail.com";
 		try {
 			Credential credentials = exchangeCode(authorizationCode);
 			Userinfoplus userInfo = getUserInfo(credentials);
